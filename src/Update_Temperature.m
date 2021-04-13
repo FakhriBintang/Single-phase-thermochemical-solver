@@ -41,7 +41,6 @@ switch Tsolver
                 
             end
             
-            Material = round(Material);
         else
             lapl_T  = Kappa0*(diff(T_mid(:,icx),2,1) + diff(T_mid(icz,:),2,2))/dz/dx;... % finite differences
                 + (Hr(2:end-1,2:end-1) + Hs(2:end-1,2:end-1) +...

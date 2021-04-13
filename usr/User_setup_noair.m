@@ -5,13 +5,13 @@ close all
 % profile off
 % profile on
 % profile off
-RunID       = '200x200 imping plume fromm';   % run identifier
+RunID       = 'Test';   % run identifier
 
 %% setup model domain (user editable)
 L           = 500*1e3;                          % length of x domain
 D           = 500*1e3;                          % length of z domain
-nx          = 200;                               % number of real x block nodes
-nz          = 200;                               % number of real z block nodes
+nx          = 100;                               % number of real x block nodes
+nz          = 100;                               % number of real z block nodes
 nx1         = nx+1;                             % number of x gridpoints
 nz1         = nz+1;                             % number of z gridpoints
 Nx          = nx+2;                             % number of x edgepoints (+ ghost)
@@ -22,14 +22,20 @@ rplume      = 100000;                           % radius of plume (if modelling 
 %% setup physical parameters
 gz          = 10;                               % vertical/z gravitational constant 
 gx          = 0;                                % horizontal/x gravitational constant
-Ambtype    = 'constant'                        % constant ambient background temperature
-% Ambtype    = 'linear'                          % linear temperaure profile between top and bottom
-% Ambtype     = 'gaussian'
 
+% initial ambent conditions
+% Ambtype     = 'constant'                        % constant ambient background temperature
+% Ambtype    = 'linear'                      % linear temperaure profile between top and bottom
+% Ambtype    = 'gaussian'                    % Gaussian central plume
+Ambtype     = 'hot bottom'                      % a hot lower boundary, skips the initial T diffusion stage
+
+% bottom boundary conditions
+BotBoundary     = 'uniform'                     % uniform, constant bottom boundary
+% BotBoundary     = 'hell portal'                 % the centre on the bottom boundary hotter than the other
 
 
 %% setup material parameters
-%        Mantle      |1
+%        Mantle      ||
 Rho_mantle  =   3300;   % density
 Eta_mantle  =   1e20;   % viscosity  
 Alpha_mantle=   3e-5;   % thermal expansion   
@@ -46,6 +52,8 @@ T_bot       =   1200;   T_top       =   1200;
 case 'linear'
 T_bot       =   1500;   T_top       =   1200;  
 case 'gaussian'
+T_bot       =   1500;   T_top       =   1200;
+case 'hot bottom'
 T_bot       =   1500;   T_top       =   1200;
 end
 
@@ -71,6 +79,11 @@ bcbottom        = -1;
 % T_bot           = T_plume;
 
 Ra = Rho0*Alpha_mantle*300*(L^3)*gz/Eta_mantle/(Kappa_mantle/Rho0/Cp_mantle)
+% Ra = 1
+if Ra<1e3
+    disp('Rayleigh number too low, no free convection')
+    return
+end
 %% Loop settings
 % % =================================================================% %
 % choose temperature solver regime %

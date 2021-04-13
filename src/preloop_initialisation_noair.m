@@ -27,7 +27,15 @@ switch Ambtype
         T_mid = zeros(Nz,Nx)+T_top; 
         T_mid = T_mid + (T_bot-T_top+300).*exp(- (xp2d-L/2).^2./radius.^2 - (zp2d-L/2).^2./radius.^2 );
         T_mid(Nz,:) = T_bot;
+    case 'hot bottom'
+        Th = round(Nz*0.2);
+        T_mid = zeros(Nz,Nx)+T_top;
+        T_mid(Nz-Th+1:Nz,:) = T_top+zp2d(1:Th,:)./(D.*0.2).*(T_bot-T_top);
+       T_mid(Nz-Th+1:Nz,:) = T_bot;
 end
+
+% imagesc(xp(2:end-1),zp(2:end-1),T_mid(2:end-1,2:end-1))
+%     colormap(flipud(cm))
 
     Material    = ones(Nz,Nx); % artificial colours for visual representation of deformation
     Material(1:nz/10,:) = 2; Material(0.2*nz:0.3*nz,:) = 2; Material(0.4*nz:0.5*nz,:) = 2;
