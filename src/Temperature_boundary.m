@@ -35,5 +35,3 @@ switch BotBoundary
         
     case 'uniform'
 end
-[Rho_vx,Rho_vz,Rho_mid] = Thermal_expansion(Rho0,...
-    T_mid,T_vx,T_vz,Alpha_vx,Alpha_vz,Alpha_mid,T_top);
