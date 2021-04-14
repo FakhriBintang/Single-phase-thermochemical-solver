@@ -3,8 +3,8 @@ adv_T0 = adv_T;     lapl_T0 = lapl_T;
 T0 = T_mid;        
 Hxz = Sigxx;
 %% calculate stresses and shear/adiabatic heating
-Epsxz(1:nz1,1:nx1) = 1/2 .* ((vx_out(2:Nz,1:nx1) - vx_out(1:nz1,1:nx1))./dz...
-    +  (vz_out(1:nz1,2:Nx) - vz_out(1:nz1,1:nx1))./dx);
+Epsxz(1:nz1,1:nx1) = 1/2 .* ((vx_out(2:nz2,1:nx1) - vx_out(1:nz1,1:nx1))./dz...
+    +  (vz_out(1:nz1,2:nx2) - vz_out(1:nz1,1:nx1))./dx);
 Sigxz(1:nz1,1:nx1) =   2 .* Eta_out(1:nz1,1:nx1).*Epsxz(1:nz1,1:nx1);
 
 %calculate normal stress/strain components on the middle of grid/pressure nodes
@@ -27,7 +27,7 @@ switch Tsolver
     case 'explicit'
         %assume average thermal conductivity for now
         Kappa0 = mode(k_vx(:)) / mean(Rho_mid(:)) / mode(Cp_mid(:));
-        icx = 2:Nx-1; icz = 2:Nz-1;
+        icx = 2:nx2-1; icz = 2:nz2-1;
         if ti > 1
             for it = 1:10
                 lapl_T = Kappa0*(diff(T_mid(:,icx),2,1) + diff(T_mid(icz,:),2,2))/dz/dx;... % finite differences
@@ -58,9 +58,9 @@ switch Tsolver
         %         dT = T_out-T_mid;
         %     case 'implicit'
         %         %setip matrix and vector for implicit solution
-        %         NP          = Nx*Nz; % total number of P nodes to solve + ghost nodes
+        %         NP          = nx2*nz2; % total number of P nodes to solve + ghost nodes
         %         T_out      = T_mid;
-        %         ind         = reshape(1:NP,Nz,Nx);
+        %         ind         = reshape(1:NP,nz2,nx2);
         %
         %
         %         II  = [];
@@ -106,15 +106,15 @@ switch Tsolver
         %         IR = [IR, ii(:)']; RR = [RR, Asum(:)'*T_top*2];
         %
         %         %bottom constant temp
-        %         ii  = ind(Nz,2:nx1); jj  = ind(Nz,2:nx1); jj1 = ind(nz1,2:nx1); %below top boundary
-        %         Asum = zeros(size(ii)); Asum1 = Asum.*T_mid(Nz,2:nx1).*2;
+        %         ii  = ind(nz2,2:nx1); jj  = ind(nz2,2:nx1); jj1 = ind(nz1,2:nx1); %below top boundary
+        %         Asum = zeros(size(ii)); Asum1 = Asum.*T_mid(nz2,2:nx1).*2;
         %         II = [II, ii(:)']; JJ = [JJ, jj(:)'];   AA = [AA, Asum(:)'+1];
         %         II = [II, ii(:)']; JJ = [JJ, jj1(:)'];  AA = [AA, Asum(:)'+1];
         %         %RHS
         %         IR = [IR, ii(:)']; RR = [RR, Asum1(:)'];
         %
         %         %left insulating boundary
-        %         ii  = ind(1:Nz,1); jj  = ind(1:Nz,1); jj1 = ind(1:Nz,2); %below top boundary
+        %         ii  = ind(1:nz2,1); jj  = ind(1:nz2,1); jj1 = ind(1:nz2,2); %below top boundary
         %         Asum = zeros(size(ii));
         %         II = [II, ii(:)']; JJ = [JJ, jj(:)'];   AA = [AA, Asum(:)'+1];
         %         II = [II, ii(:)']; JJ = [JJ, jj1(:)'];  AA = [AA, Asum(:)'-1];
@@ -122,7 +122,7 @@ switch Tsolver
         %         IR = [IR, ii(:)']; RR = [RR, Asum(:)'];
         %
         %         %right insulating boundary
-        %         ii  = ind(1:Nz,Nx); jj  = ind(1:Nz,Nx); jj1 = ind(1:Nz,nx1); %below top boundary
+        %         ii  = ind(1:nz2,nx2); jj  = ind(1:nz2,nx2); jj1 = ind(1:nz2,nx1); %below top boundary
         %         Asum = zeros(size(ii));
         %         II = [II, ii(:)']; JJ = [JJ, jj(:)'];   AA = [AA, Asum(:)'+1];
         %         II = [II, ii(:)']; JJ = [JJ, jj1(:)'];  AA = [AA, Asum(:)'-1];

@@ -15,47 +15,47 @@
 % temperature
 switch Ambtype
     case 'constant'
-        T_mid = zeros(Nz,Nx)+T_top;
-        T_mid(Nz:nz-1,:) = T_bot;
-        T_mid(Nz,:) = T_bot+300;
+        T_mid = zeros(nz2,nx2)+T_top;
+        T_mid(nz2:nz-1,:) = T_bot;
+        T_mid(nz2,:) = T_bot+300;
     case 'linear'
         T_mid = T_top + abs(zp2d)./D.*(T_bot-T_top);
     case 'gaussian'
         radius = L/7;
         %         T_amp = T_bot-T_top+300;
         %         T_amp = 600;
-        T_mid = zeros(Nz,Nx)+T_top;
+        T_mid = zeros(nz2,nx2)+T_top;
         T_mid = T_mid + (T_bot-T_top+300).*exp(- (xp2d-L/2).^2./radius.^2 - (zp2d-L/2).^2./radius.^2 );
-        T_mid(Nz,:) = T_bot;
+        T_mid(nz2,:) = T_bot;
     case 'hot bottom'
-        Th = round(Nz*0.2);
-        T_mid = zeros(Nz,Nx)+T_top;
-        T_mid(Nz-Th+1:Nz,:) = T_top+zp2d(1:Th,:)./(D.*0.2).*(T_bot-T_top);
-        T_mid(Nz-Th+1:Nz,:) = T_bot;
+        Th = round(nz2*0.2);
+        T_mid = zeros(nz2,nx2)+T_top;
+        T_mid(nz2-Th+1:nz2,:) = T_top+zp2d(1:Th,:)./(D.*0.2).*(T_bot-T_top);
+        T_mid(nz2-Th+1:nz2,:) = T_bot;
 end
 
 %% setup material grids
 % imagesc(xp(2:end-1),zp(2:end-1),T_mid(2:end-1,2:end-1))
 %     colormap(flipud(cm))
 
-Material    = ones(Nz,Nx); % artificial colours for visual representation of deformation
+Material    = ones(nz2,nx2); % artificial colours for visual representation of deformation
 Material(1:nz/10,:) = 2; Material(0.2*nz:0.3*nz,:) = 2; Material(0.4*nz:0.5*nz,:) = 2;
 Material(0.6*nz:0.7*nz,:) = 2; Material(0.8*nz:0.9*nz,:) = 2;
-Alpha_mid   = zeros(Nz,Nx) + Alpha_mantle;
-Eta_mid     = zeros(Nz,Nx) + Eta_mantle; Eta_out = Eta_mid; % viscosity
-Kappa_mid   = zeros(Nz,Nx) + Kappa_mantle; % thermal conductivity
-Cp_mid      = zeros(Nz,Nx) + Cp_mantle; % heat capacity
-Hr_mid      = zeros(Nz,Nx) + Hr_mantle; % radiogenic heat production
+Alpha_mid   = zeros(nz2,nx2) + Alpha_mantle;
+Eta_mid     = zeros(nz2,nx2) + Eta_mantle; Eta_out = Eta_mid; % viscosity
+Kappa_mid   = zeros(nz2,nx2) + Kappa_mantle; % thermal conductivity
+Cp_mid      = zeros(nz2,nx2) + Cp_mantle; % heat capacity
+Hr_mid      = zeros(nz2,nx2) + Hr_mantle; % radiogenic heat production
 
 %initialise staggered grids
-T_vx     = zeros(Nz,Nx); T_vz     = zeros(Nz,Nx);
-k_vx     = zeros(Nz,Nx); k_vz     = zeros(Nz,Nx);
-Alpha_vx = zeros(Nz,Nx); Alpha_vz = zeros(Nz,Nx);
+T_vx     = zeros(nz2,nx2); T_vz     = zeros(nz2,nx2);
+k_vx     = zeros(nz2,nx2); k_vz     = zeros(nz2,nx2);
+Alpha_vx = zeros(nz2,nx2); Alpha_vz = zeros(nz2,nx2);
 
 
 %% initialise arrays
-Epsxz           = zeros(Nz,Nx);     % strain rate on the ordinary grid
-Sigxz           = zeros(Nz,Nx);     % deviatoric stress on the ordinary grid
+Epsxz           = zeros(nz2,nx2);     % strain rate on the ordinary grid
+Sigxz           = zeros(nz2,nx2);     % deviatoric stress on the ordinary grid
 Epsxx           = Epsxz;            % strain rate in 
 Sigxx           = Sigxz;            % deviatoric stress the middle of grid/pressure nodes
 Hs              = Sigxx;            % shear heating, on the pressure nodes
@@ -65,4 +65,4 @@ adv_T = 0;     lapl_T = 0;   dMdt = 0;
 
 
 %% create indexing system
-Number  = numsetup(Nz,Nx);  % ordinary grid
+Number  = numsetup(nz2,nx2);  % ordinary grid

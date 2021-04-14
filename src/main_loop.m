@@ -24,7 +24,7 @@ while time < max_time && ti < nt
     
     % only solve stokes every one gridstep advected
     if ti == 0 || ~mod(ti,round(2/CFL))
-        [P_out,vx_out,vz_out,vx_mid,vz_mid] = stokes_continuity_noair(nx,nz,Nx,Nz,nx1,nz1,dx,dz,...
+        [P_out,vx_out,vz_out,vx_mid,vz_mid] = stokes_continuity_noair(nx,nz,nx2,nz2,nx1,nz1,dx,dz,...
             Eta_out,Eta_mid,Rho_vx,Rho_vz,gx,gz,zp2d,bctop,bcbottom,bcleft,bcright,cstab);
     end
     

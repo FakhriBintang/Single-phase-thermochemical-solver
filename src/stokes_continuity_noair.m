@@ -1,30 +1,28 @@
-function [P_out,vx_out,vz_out,vx_mid,vz_mid] = stokes_continuity_noair(nx,nz,Nx,Nz,nx1,nz1,dx,dz,...
+function [P_out,vx_out,vz_out,vx_mid,vz_mid] = stokes_continuity_noair(nx,nz,nx2,nz2,nx1,nz1,dx,dz,...
           Eta_out,Eta_mid,Rho_vx,Rho_vz,gx,gz,zp2d,bctop,bcbottom,bcleft,bcright,cstab)
 
-NP      = Nx*Nz; % total number of P nodes to solve + ghost nodes
-NU      = Nx*Nz; % total number of vx nodes to solve + ghost nodes
-NW      = Nx*Nz; % total number of vz nodes to solve + ghost nodes
+NP      = nx2*nz2; % total number of P nodes to solve + ghost nodes
+NU      = nx2*nz2; % total number of vx nodes to solve + ghost nodes
+NW      = nx2*nz2; % total number of vz nodes to solve + ghost nodes
 N_all   = NP+NU+NW;
 
 %indexing of unknowns
-indvx   = reshape(1:2:(NU+NW),Nz,Nx);
-indvz   = reshape(2:2:(NW+NU),Nz,Nx);
-indP    = reshape(1:NP,Nz,Nx) + NU + NW;
+indvx   = reshape(1:2:(NU+NW),nz2,nx2);
+indvz   = reshape(2:2:(NW+NU),nz2,nx2);
+indP    = reshape(1:NP,nz2,nx2) + NU + NW;
 
 % setup A matrix and RHS vector
-% A = sparse(N_all,N_all);
-% RHS = zeros(N_all,1);
 II  = [];
 JJ  = [];
 AA  = [];
 IR  = [];
 RR  = [];
 
-Pscale   = geomean(Eta_mid(:))/(dx*dz); % pressure scaling coefficient
-Rhoscale = mean(Rho_vz(:));
+Pscale = geomean(Eta_mid(:))/(dx*dz); % pressure scaling coefficient
+RhoRef = mean(Rho_vz(:));
 
 
-%% assembling coefficients internal points of x stokes equation
+%% assemble coefficients of x momentum equation for vx
 % top boundary (i==1 && j>1 && j<nx1)
 ii = indvx(1,2:nx); jj1 = ii; jj2 = indvx(2,2:nx);
 Asum = zeros(size(ii));
@@ -33,8 +31,8 @@ II = [II, ii(:)']; JJ = [JJ, jj2(:)'];   AA = [AA, Asum+bctop];
 % RHS
 IR = [IR, ii(:)']; RR = [RR, Asum];
 
-% bottom boundary (i==Nz && j>1 && j<nx1)
-ii = indvx(Nz,2:nx); jj1 = ii; jj2 = indvx(nz1,2:nx);
+% bottom boundary (i==nz2 && j>1 && j<nx1)
+ii = indvx(nz2,2:nx); jj1 = ii; jj2 = indvx(nz1,2:nx);
 Asum = zeros(size(ii));
 II = [II, ii(:)']; JJ = [JJ, jj1(:)'];   AA = [AA, Asum(:)'+1];
 II = [II, ii(:)']; JJ = [JJ, jj2(:)'];   AA = [AA, Asum(:)'+bcbottom];
@@ -42,11 +40,11 @@ II = [II, ii(:)']; JJ = [JJ, jj2(:)'];   AA = [AA, Asum(:)'+bcbottom];
 IR = [IR, ii(:)']; RR = [RR, Asum(:)'];
 
 %left & right (+ghost right)
-ii = indvx(1:Nz,1); jj = ii;
+ii = indvx(1:nz2,1); jj = ii;
 Asum = zeros(size(ii));
 II = [II, ii(:)']; JJ = [JJ, jj(:)'];   AA = [AA, Asum(:)'+1];
 IR = [IR, ii(:)']; RR = [RR, Asum(:)'];
-ii = indvx(1:Nz,nx1:Nx); jj = ii;
+ii = indvx(1:nz2,nx1:nx2); jj = ii;
 Asum = zeros(size(ii));
 II = [II, ii(:)']; JJ = [JJ, jj(:)'];   AA = [AA, Asum(:)'+1];
 IR = [IR, ii(:)']; RR = [RR, Asum(:)'];
@@ -79,10 +77,11 @@ II = [II, ii(:)']; JJ = [JJ, jj1(:)'];   AA = [AA,    Asum(:)'+Pscale/dx]; % P1;
 II = [II, ii(:)']; JJ = [JJ, jj2(:)'];   AA = [AA,    Asum(:)'-Pscale/dx]; % P2; right of current node
 
 % RHS vector
-Rsum = zeros(size(ii)) - gx*(Rho_vx(2:nz1,2:nx)-Rhoscale);
+Rsum = zeros(size(ii)) - gx*(Rho_vx(2:nz1,2:nx)-RhoRef);
 IR = [IR, ii(:)']; RR = [RR, Rsum(:)'];
 
-%% solve internal points of z stokes equation
+
+%% assemble coefficients of z momentum equation for vz
 % left boundary (j==1 && i>1 && i<nz1)
 ii = indvz(2:nz,1); jj1 = ii; jj2 = indvz(2:nz,2);
 Asum = zeros(size(ii));
@@ -91,8 +90,8 @@ II = [II, ii(:)']; JJ = [JJ, jj2(:)'];   AA = [AA, Asum(:)'+bcleft];
 % RHS
 IR = [IR, ii(:)']; RR = [RR, Asum(:)'];
 
-% right boundary (j==Nx && i>1 && i<nz1)
-ii = indvz(2:nz,Nx); jj1 = ii; jj2 = indvz(2:nz,nx1);
+% right boundary (j==nx2 && i>1 && i<nz1)
+ii = indvz(2:nz,nx2); jj1 = ii; jj2 = indvz(2:nz,nx1);
 Asum = zeros(size(ii));
 II = [II, ii(:)']; JJ = [JJ, jj1(:)'];   AA = [AA, Asum(:)'+1];
 II = [II, ii(:)']; JJ = [JJ, jj2(:)'];   AA = [AA, Asum(:)'+bcright];
@@ -100,7 +99,7 @@ II = [II, ii(:)']; JJ = [JJ, jj2(:)'];   AA = [AA, Asum(:)'+bcright];
 IR = [IR, ii(:)']; RR = [RR, Asum(:)'];
 
 %top & bottom (+ghost bottom)
-ii = [indvz(1,1:Nx), indvz(nz1,1:Nx), indvz(Nz,1:Nx)]; jj = ii;
+ii = [indvz(1,1:nx2), indvz(nz1,1:nx2), indvz(nz2,1:nx2)]; jj = ii;
 Asum = zeros(size(ii));
 II = [II, ii(:)']; JJ = [JJ, jj(:)'];   AA = [AA, Asum(:)'+1];
 IR = [IR, ii(:)']; RR = [RR, Asum(:)'];
@@ -134,18 +133,19 @@ II = [II, ii(:)']; JJ = [JJ, jj1(:)'];   AA = [AA,   Asum(:)'+Pscale/dx]; % P1; 
 II = [II, ii(:)']; JJ = [JJ, jj2(:)'];   AA = [AA,   Asum(:)'-Pscale/dx]; % P2; right of current node
 
 % RHS
-Rsum = zeros(size(ii)) - gz*(Rho_vz(2:nz,2:nx1)-Rhoscale);
+Rsum = zeros(size(ii)) - gz*(Rho_vz(2:nz,2:nx1)-RhoRef);
 IR = [IR, ii(:)']; RR = [RR, Rsum(:)'];
 
-%% solve internal points of P continuity equation
+
+%% assemble coefficients of continuity equation for P
 % boundary points
-ii = [indP(1,:), indP(Nz,:)]; %top & bottom
+ii = [indP(1,:), indP(nz2,:)]; %top & bottom
 jj = ii;
 Asum = zeros(size(ii));
 II = [II, ii(:)']; JJ = [JJ, jj(:)'];   AA = [AA, Asum(:)'+1];
 IR = [IR, ii(:)']; RR = [RR, Asum(:)'];
 
-ii = [indP(2:nz1,1), indP(2:nz1, Nx)]; % left & right
+ii = [indP(2:nz1,1), indP(2:nz1, nx2)]; % left & right
 jj = ii;
 Asum = zeros(size(ii));
 II = [II, ii(:)']; JJ = [JJ, jj(:)'];   AA = [AA, Asum(:)'+1];
@@ -174,46 +174,46 @@ RR = [RR, Rsum(:)'];
 % IR = [IR,indP(2,2)]; RR = [RR, RHOb*dz/2*gz];
 
 
-%% Assemble coefficient matrix and right-hand side vector
-A       = sparse(II,JJ,AA,N_all,N_all);
-RHS     = sparse(IR,ones(size(IR)),RR,N_all,1);
+%% Assemble global coefficient matrix and right-hand side vector
+A = sparse(II,JJ,AA,N_all,N_all);
+R = sparse(IR,ones(size(IR)),RR,N_all,1);
 
 
 %% Scale system of equations (diagonal preconditioning)
-X           =  sqrt(abs(diag(A)));
-X           =  diag(sparse(1./X));
+S  =  sqrt(abs(diag(A)));
+S  =  diag(sparse(1./S));
 
-A           =  X*A*X;
-RHS         =  X*RHS;
+A  =  S*A*S;
+R  =  S*R;
 
 
-%% Solve stokes matrix and convert output vector to matrices
-c = X*(A\RHS); % get solution vector
+%% Solve linear system of equations for vx, vz, P
+X = S*(A\R); % get solution vector
 
-% extrapolate into individual matrices
-P_out  = reshape(c(indP(:)),Nz,Nx).*Pscale + Rhoscale.*gz.*zp2d;
-P_out  = P_out - mean(P_out(2,:)) + Rhoscale*dz/2*gz;
-vx_out = reshape(c(indvx(:)),Nz,Nx);
-vz_out = reshape(c(indvz(:)),Nz,Nx);
+% map solution vector to arrays
+P_out  = reshape(X(indP(:)),nz2,nx2).*Pscale + RhoRef.*gz.*zp2d;
+P_out  = P_out - mean(P_out(2,:)) + RhoRef*dz/2*gz;
+vx_out = reshape(X(indvx(:)),nz2,nx2);
+vz_out = reshape(X(indvz(:)),nz2,nx2);
 
-% averaging velocities on centre nodes
-vx_mid = zeros(Nz,Nx);
-vz_mid = zeros(Nz,Nx);
+% project velocities to centre nodes
+vx_mid = zeros(nz2,nx2);
+vz_mid = zeros(nz2,nx2);
 
 vx_mid(:,2:nx1) = vx_out(:,2:nx1)+vx_out(:,1:nx)./2;
 vz_mid(2:nz1,:) = vz_out(2:nz1,:)+vz_out(1:nz,:)./2;
 
-%applying free-slip boundary conditions
+% apply boundary conditions
 %Top
-vx_mid(1,2:nx1)  = -bctop*vx_mid(2,2:nx1);
-vz_mid(1,:)      = -vz_mid(2,:);
+vx_mid(1,2:nx1)   = -bctop*vx_mid(2,2:nx1);
+vz_mid(1, :   )   = -      vz_mid(2, :   );
 %bottom
-vx_mid(Nz,2:nx1) = -bcbottom*vx_mid(nz1,2:nx1);
-vz_mid(nz1,:)    = -vz_mid(nz,:);
+vx_mid(nz2,2:nx1) = -bcbottom*vx_mid(nz1,2:nx1);
+vz_mid(nz1, :   ) = -         vz_mid(nz , :   );
 %left
-vx_mid(:,1)      = -vx_mid(:,2);
-vz_mid(2:nz,1)   = -bcleft*vz_mid(2:nz,2);
+vx_mid( :  ,1)    = -       vx_mid( :  ,2);
+vz_mid(2:nz,1)    = -bcleft*vz_mid(2:nz,2);
 %right
-vx_mid(:,nx1)    =-vx_mid(:,nx);
-vz_mid(2:nz,Nx)  =-bcright*vz_mid(2:nz,nx1); % Free slip
+vx_mid( :  ,nx1)  = -        vx_mid( :  ,nx );
+vz_mid(2:nz,nx2)  = -bcright*vz_mid(2:nz,nx1);
 

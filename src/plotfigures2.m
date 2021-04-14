@@ -3,7 +3,7 @@
 figure(1);
 subplot(2,3,1)
 imagesc(xvx,zvx,vx_out(:,1:end-1)); hold on;
-quiver(xp(6:10:Nx),zp(6:10:Nz),vx_mid(6:10:nz1,6:10:Nx),vz_mid(6:10:Nz,6:10:Nx),'k')
+quiver(xp(6:10:nx2),zp(6:10:nz2),vx_mid(6:10:nz1,6:10:nx2),vz_mid(6:10:nz2,6:10:nx2),'k')
 colormap(subplot(2,3,1),flipud(cm2))
 axis ij equal tight;
 colorbar
@@ -11,7 +11,7 @@ title('x-velocity [ms^-^1]')
 
 subplot(2,3,2)
 imagesc(xvz,zvz,vz_out(1:end-1,:)); hold on;
-quiver(xp(6:10:Nx),zp(6:10:Nz),vx_mid(6:10:nz1,6:10:Nx),vz_mid(6:10:Nz,6:10:Nx),'k')
+quiver(xp(6:10:nx2),zp(6:10:nz2),vx_mid(6:10:nz1,6:10:nx2),vz_mid(6:10:nz2,6:10:nx2),'k')
 colormap(subplot(2,3,2),cm2)
 axis ij equal tight;
 colorbar
@@ -19,7 +19,7 @@ title('z-velocity [ms^-^1]')
 
 subplot(2,3,3)
 imagesc(xp(2:end-1),zp(2:end-1),P_out(2:end-1,2:end-1)); hold on;
-quiver(xp(6:10:Nx),zp(6:10:Nz),vx_mid(6:10:nz1,6:10:Nx),vz_mid(6:10:Nz,6:10:Nx),'k')
+quiver(xp(6:10:nx2),zp(6:10:nz2),vx_mid(6:10:nz1,6:10:nx2),vz_mid(6:10:nz2,6:10:nx2),'k')
 colormap(subplot(2,3,3),cm1)
 axis ij equal tight;
 colorbar

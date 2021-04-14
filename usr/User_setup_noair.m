@@ -14,8 +14,8 @@ nx          = 100;                               % number of real x block nodes
 nz          = 100;                               % number of real z block nodes
 nx1         = nx+1;                             % number of x gridpoints
 nz1         = nz+1;                             % number of z gridpoints
-Nx          = nx+2;                             % number of x edgepoints (+ ghost)
-Nz          = nz+2;                             % number of z edgepoints (+ ghost)
+nx2         = nx+2;                             % number of x edgepoints (+ ghost)
+nz2         = nz+2;                             % number of z edgepoints (+ ghost)
 dx          = L/nx;                             % spacing of x coordinates
 dz          = D/nz;                             % spacing of z coordinates
 
