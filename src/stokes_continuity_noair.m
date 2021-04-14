@@ -217,3 +217,6 @@ vz_mid(2:nz,1)    = -bcleft*vz_mid(2:nz,2);
 vx_mid( :  ,nx1)  = -        vx_mid( :  ,nx );
 vz_mid(2:nz,nx2)  = -bcright*vz_mid(2:nz,nx1);
 
+% get velocity divergence
+Divv = diff(vx_out(2:end-1,1:end-1),1,2)./dx + diff(vz_out(1:end-1,2:end-1),1,1)./dz;
+
