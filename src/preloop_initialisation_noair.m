@@ -28,10 +28,8 @@ switch Ambtype
         T_mid = T_mid + (T_bot-T_top+300).*exp(- (xp2d-L/2).^2./radius.^2 - (zp2d-L/2).^2./radius.^2 );
         T_mid(nz2,:) = T_bot;
     case 'hot bottom'
-        Th = round(nz2*0.2);
         T_mid = zeros(nz2,nx2)+T_top;
-        T_mid(nz2-Th+1:nz2,:) = T_top+zp2d(1:Th,:)./(D.*0.2).*(T_bot-T_top);
-        T_mid(nz2-Th+1:nz2,:) = T_bot;
+        T_mid = T_mid + 1./(1+exp(-(zp2d-3/4*D-D/100.*cos(xp2d*2*pi/D))./(D/50))) .* (T_bot-T_top);
 end
 
 %% setup material grids
