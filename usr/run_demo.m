@@ -13,7 +13,7 @@ RUN.nup     =  1;               % update every 'nup' grid steps of transport
 %% set model timing
 NUM.yr      =  3600*24*365.25;  % seconds per year
 NUM.maxstep =  1e4;             % maximum number of time steps
-NUM.tend    =  1e7*NUM.yr;      % model stopping time [s]
+NUM.tend    =  1e8*NUM.yr;      % model stopping time [s]
 
 % [do not modify]
 NUM.dt      =  1e3*NUM.yr;      % (initial) time step [s]
@@ -22,8 +22,8 @@ NUM.dt      =  1e3*NUM.yr;      % (initial) time step [s]
 %% set model domain
 NUM.D       =  500*1e3;         % length of z domain
 NUM.L       =  500*1e3;         % length of x domain
-NUM.nz      =  200;             % number of real z block nodes
-NUM.nx      =  200;          	% number of real x block nodes
+NUM.nz      =  100;             % number of real z block nodes
+NUM.nx      =  100;          	% number of real x block nodes
 
 % [do not modify]
 NUM.dx      =  NUM.L/NUM.nx;    % spacing of x coordinates
@@ -36,14 +36,14 @@ PHY.Eta0    =  1e19;         	% reference viscosity [Pas]
 PHY.aT0     =  3e-5;            % thermal expansivity [1/K]
 PHY.kT0     =  10;              % Thermal conductivity [W/m/K]
 PHY.Cp0     =  1000;            % Volumetric heat capacity [J/kg/K]
-PHY.Hr0     =  2e-8;            % Radiogenic heat productivity [W/m3]
+PHY.Hr0     =  1e-8;            % Radiogenic heat productivity [W/m3]
 PHY.gz      =  10;              % z-gravity 
 PHY.gx      =  0;               % x-gravity
 
 
 %% set initial condition
-SOL.T0      =  1200;           	% reference (top) temperature [C]
-SOL.T1      =  1600;           	% bottom temperature (if different from top) [C]
+SOL.T0      =  1000;           	% reference (top) temperature [C]
+SOL.T1      =  2000;           	% bottom temperature (if different from top) [C]
 SOL.dT      =  300;           	% temperature perturbation amplitude [C]
 SOL.rT      =  100e3;         	% radius of hot plume [m]
 SOL.zT      =  NUM.D/2;         % z-position of hot plume [m]
@@ -94,6 +94,7 @@ if ~exist(['../out/',RUN.ID],'dir'); mkdir(['../out/',RUN.ID]); end
 
 % add path to source directory
 addpath('../src')
+addpath('../src/cbrewer/')
 
 % use color brewer to create colormaps
 cm1 =        cbrewer('seq','YlOrRd',30) ; % sequential colour map

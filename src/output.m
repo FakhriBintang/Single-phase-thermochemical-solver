@@ -63,7 +63,7 @@ end
 % save output
 if RUN.save
     % print figure
-    name = ['../out/',RUN.ID,'/',RUN.ID,num2str(RUN.frame)];
+    name = ['../out/',RUN.ID,'/',RUN.ID,'_',num2str(RUN.frame)];
     print(fh1,name,'-dpng','-r300');
     
     % clean workspace
