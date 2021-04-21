@@ -3,7 +3,7 @@ clear; close all;
 
 
 %% set model run options
-RUN.ID      =  'Tpot';          % run identifier
+RUN.ID      =  'demo';          % run identifier
 RUN.plot    =  1;               % switch on to plot live output
 RUN.save    =  0;               % switch on to save output files
 RUN.nop     =  10;               % output every 'nop' grid steps of transport
