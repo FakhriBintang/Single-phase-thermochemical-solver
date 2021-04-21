@@ -36,11 +36,31 @@ NUM.zU   =  NUM.zP;                             % Vertical   coordinates of x-fa
 [NUM.XW,NUM.ZW] = meshgrid(NUM.xW,NUM.zW);      % z-face nodes grid
 [NUM.XU,NUM.ZU] = meshgrid(NUM.xU,NUM.zU);      % x-face nodes grid
 
+% get radial position of central nodes
+NUM.RP = ((NUM.XP-NUM.L/2).^2 + (NUM.ZP-NUM.D/2).^2).^0.5;
+
 
 %% setup mapping arrays
+NUM.Map   =  reshape(1:NUM.NP,NUM.nzP,NUM.nxP);
 NUM.MapW  =  reshape(1:NUM.NW,NUM.nzW,NUM.nxW);
 NUM.MapU  =  reshape(1:NUM.NU,NUM.nzU,NUM.nxU) + NUM.NW;
 NUM.MapP  =  reshape(1:NUM.NP,NUM.nzP,NUM.nxP) + NUM.NW + NUM.NU;
+
+
+%% setup material property arrays
+MAT.Rho	= zeros(NUM.nzP,NUM.nxP) + PHY.Rho0;  	% density
+MAT.Eta	= zeros(NUM.nzP,NUM.nxP) + PHY.Eta0;   	% viscosity
+MAT.aT	= zeros(NUM.nzP,NUM.nxP) + PHY.aT0;    	% thermal expansivity
+MAT.kT	= zeros(NUM.nzP,NUM.nxP) + PHY.kT0;     % thermal conductivity
+MAT.Cp	= zeros(NUM.nzP,NUM.nxP) + PHY.Cp0;   	% heat capacity
+
+
+%% setup gravity on centre and x,z-face nodes
+PHY.gxP = zeros(NUM.nzP,NUM.nxP) + PHY.gx;
+PHY.gzP = zeros(NUM.nzP,NUM.nxP) + PHY.gz;
+PHY.gx  = zeros(NUM.nzU,NUM.nxU) + PHY.gx;
+PHY.gz  = zeros(NUM.nzW,NUM.nxW) + PHY.gz;
+if RUN.selfgrav; solve_gravity; end
 
 
 %% setup initial condition for thermo-chemical solution arrays
@@ -60,32 +80,31 @@ switch SOL.Ttype
 end
 
 % convert from potential to natural temperature
-SOL.T = SOL.T.*exp(PHY.aT0*(PHY.gz.*(NUM.ZP+pert) + PHY.gx.*NUM.XP)./PHY.Cp0);
+if   RUN.selfgrav; SOL.T = SOL.T.*exp(PHY.aT0*PHY.gP.*(NUM.D/2-NUM.RP)./PHY.Cp0);
+else;              SOL.T = SOL.T.*exp(PHY.aT0*(PHY.gzP.*(NUM.ZP+pert) + PHY.gxP.*NUM.XP)./PHY.Cp0); end
 
+% set atmospheric/space temperature in self-gravitating case
+if RUN.selfgrav; SOL.T(NUM.RP>NUM.D/2) = SOL.T0;
 % zero gradient boundaries
-SOL.T([1 end],:) = SOL.T([2 end-1],:);
-SOL.T(:,[1 end]) = SOL.T(:,[2 end-1]);
+else
+    SOL.T([1 end],:) = SOL.T([2 end-1],:);
+    SOL.T(:,[1 end]) = SOL.T(:,[2 end-1]);
+end
 
 
 %% setup velocity-pressure solution arrays
 SOL.W   = zeros(NUM.nzW,NUM.nxW);               % z-velocity on z-face nodes
 SOL.U   = zeros(NUM.nzU,NUM.nxU);               % x-velocity on x-face nodes
 SOL.P   = zeros(NUM.nzP,NUM.nxP);               % pressure on centre nodes
+if   RUN.selfgrav; SOL.Pt = PHY.Rho0.*PHY.gP.*(NUM.D/2-NUM.RP);      % total pressure
+else;              SOL.Pt = PHY.Rho0.*(PHY.gzP.*NUM.ZP + PHY.gxP.*NUM.XP); end
 
-% project velocities to centre nodes
+% projected velocities on centre nodes
 SOL.UP = zeros(NUM.nzP,NUM.nxP);
 SOL.WP = zeros(NUM.nzP,NUM.nxP);
 
 SOL.UP(:,2:end-1) = SOL.U(:,1:end-1)+SOL.U(:,2:end)./2;
 SOL.WP(2:end-1,:) = SOL.W(1:end-1,:)+SOL.W(2:end,:)./2;
-
-
-%% setup material property arrays
-MAT.Rho	= zeros(NUM.nzP,NUM.nxP) + PHY.Rho0;  	% density
-MAT.Eta	= zeros(NUM.nzP,NUM.nxP) + PHY.Eta0;   	% viscosity
-MAT.aT	= zeros(NUM.nzP,NUM.nxP) + PHY.aT0;    	% thermal expansivity
-MAT.kT	= zeros(NUM.nzP,NUM.nxP) + PHY.kT0;     % thermal conductivity
-MAT.Cp	= zeros(NUM.nzP,NUM.nxP) + PHY.Cp0;   	% heat capacity
 
 
 %% setup deformation property arrays

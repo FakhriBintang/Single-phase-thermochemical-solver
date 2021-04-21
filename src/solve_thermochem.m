@@ -27,28 +27,27 @@ SOL.dTdt = - advn_T + (diff_T + MAT.Hr(2:end-1,2:end-1) + SOL.Hs(2:end-1,2:end-1
 SOL.T(2:end-1,2:end-1) = SOL.T(2:end-1,2:end-1) + (  NUM.theta .*SOL.dTdt   ...
                                                 + (1-NUM.theta).*    dTdto) .* NUM.dt;
 
-% apply top boundary conditions
-switch SOL.BCTempTop
-    case 'isothermal'
-        SOL.T(1,:) =     To(1,:);
-    case 'insulating'
-        SOL.T(1,:) = SOL.T (2,:);
-end
-
-% apply bottom boundary conditions
-switch SOL.BCTempBot
-    case 'isothermal'
-        SOL.T(end,:) =     To(end  ,:);
-    case 'insulating'
-        SOL.T(end,:) = SOL.T (end-1,:);
-end
-
-% apply side boundary conditions
-switch SOL.BCTempSides
-    case 'isothermal'
-        SOL.T(:,[1 end]) =     To(:,[1 end  ]);
-    case 'insulating'
-        SOL.T(:,[1 end]) = SOL.T (:,[2 end-1]);
+% apply boundary conditions
+if RUN.selfgrav; SOL.T(NUM.RP>NUM.D/2) = SOL.T0;
+else
+    
+    % apply top boundary conditions
+    switch SOL.BCTempTop
+        case 'isothermal'; SOL.T(1,:) =     To(1,:);
+        case 'insulating'; SOL.T(1,:) = SOL.T (2,:);
+    end
+    
+    % apply bottom boundary conditions
+    switch SOL.BCTempBot
+        case 'isothermal'; SOL.T(end,:) =     To(end  ,:);
+        case 'insulating'; SOL.T(end,:) = SOL.T (end-1,:);
+    end
+    
+    % apply side boundary conditions
+    switch SOL.BCTempSides
+        case 'isothermal'; SOL.T(:,[1 end]) =     To(:,[1 end  ]);
+        case 'insulating'; SOL.T(:,[1 end]) = SOL.T (:,[2 end-1]);
+    end
 end
 
 toc_solve = toc;  % stop clock temperature solution

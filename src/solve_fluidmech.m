@@ -87,7 +87,7 @@ II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+Pscale/NUM.dz];     % P o
 II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)-Pscale/NUM.dz];     % P one to the bottom
 
 % RHS vector
-rr = zeros(size(ii)) - PHY.gz*( (MAT.Rho(2:end-2,2:end-1)+MAT.Rho(3:end-1,2:end-1))/2 - RhoRef);
+rr = zeros(size(ii)) - PHY.gz(2:end-1,2:end-1).*( (MAT.Rho(2:end-2,2:end-1)+MAT.Rho(3:end-1,2:end-1))/2 - RhoRef);
 IR = [IR; ii(:)];  RR = [RR; rr(:)];
 
 
@@ -153,7 +153,7 @@ II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+Pscale/NUM.dx];     % P o
 II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)-Pscale/NUM.dx];     % P one to the right
 
 % RHS vector
-rr = zeros(size(ii)) - PHY.gx*( (MAT.Rho(2:end-1,2:end-2)+MAT.Rho(2:end-1,3:end-1))/2 - RhoRef);
+rr = zeros(size(ii)) - PHY.gx(2:end-1,2:end-1).*( (MAT.Rho(2:end-1,2:end-2)+MAT.Rho(2:end-1,3:end-1))/2 - RhoRef);
 IR = [IR; ii(:)];  RR = [RR; rr(:)];
 
 
@@ -168,9 +168,9 @@ II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
 II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)-1];
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
-ii  = [indP(:,1).'; indP(:,end  ).']; % left & right
+ii  = [indP(:,1); indP(:,end  )]; % left & right
 jj1 = ii;
-jj2 = [indP(:,2).'; indP(:,end-1).'];
+jj2 = [indP(:,2); indP(:,end-1)];
 
 aa = zeros(size(ii));
 II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
@@ -224,11 +224,11 @@ X = S*(A\R); % get solution vector
 
 %% Read out solution
 % map solution vector to 2D arrays
-SOL.P  = reshape(X(indP(:)),NUM.nzP,NUM.nxP).*Pscale;               % dynamic pressure
-SOL.Pt = SOL.P + RhoRef.*PHY.gz.*NUM.ZP + RhoRef.*PHY.gx.*NUM.XP;   % total pressure
-SOL.Pt = SOL.Pt - mean(SOL.Pt(2,:)) + RhoRef*NUM.dz/2*PHY.gz;       % adjust total pressure to set surface pressure
-SOL.W  = reshape(X(indW(:)),NUM.nzW,NUM.nxW);                       % z-velocity
-SOL.U  = reshape(X(indU(:)),NUM.nzU,NUM.nxU);                       % x-velocity
+SOL.P  = reshape(X(indP(:)),NUM.nzP,NUM.nxP).*Pscale;                      % dynamic pressure
+if   RUN.selfgrav; SOL.Pt = SOL.P + RhoRef.*PHY.gP.*(NUM.D/2-NUM.RP);      % total pressure
+else;              SOL.Pt = SOL.P + RhoRef.*(PHY.gzP.*NUM.ZP + PHY.gxP.*NUM.XP); end
+SOL.W  = reshape(X(indW(:)),NUM.nzW,NUM.nxW);                              % z-velocity
+SOL.U  = reshape(X(indU(:)),NUM.nzU,NUM.nxU);                              % x-velocity
 
 % project velocities to centre nodes
 SOL.UP(:,2:end-1) = SOL.U(:,1:end-1)+SOL.U(:,2:end)./2;

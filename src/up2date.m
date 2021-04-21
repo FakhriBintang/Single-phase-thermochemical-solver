@@ -77,7 +77,7 @@ DEF.tII(:,[1 end]) = DEF.tII(:,[2 end-1]);
 SOL.Hs = 2.*DEF.eII.*DEF.tII;
 
 % update adiabatic heating
-SOL.Ha = (SOL.WP.*PHY.gz + SOL.UP.*PHY.gx) .* MAT.Rho.*MAT.aT.*SOL.T;
+SOL.Ha = (SOL.WP.*PHY.gzP + SOL.UP.*PHY.gxP) .* MAT.Rho.*MAT.aT.*SOL.T;
 
 
 toc_update = toc;

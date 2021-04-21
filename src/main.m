@@ -22,9 +22,10 @@ while NUM.time < NUM.tend && NUM.step < NUM.maxstep
     % % =============================================================
     
     if ~mod(NUM.step,round(2*RUN.nup/NUM.CFL))  % perform every 'nup' gridsteps of transport
-        up2date;                    % update materials & deformation
-        solve_fluidmech;            % solve  fluid mechanics
-        up2date;                    % update materials & deformation
+        if RUN.selfgrav; solve_gravity; end     % update gravity
+        up2date;                                % update materials & deformation
+        solve_fluidmech;                        % solve  fluid mechanics
+        up2date;                                % update materials & deformation
     end
     
     % % =============================================================

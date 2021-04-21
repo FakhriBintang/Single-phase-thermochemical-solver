@@ -3,12 +3,12 @@ clear; close all;
 
 
 %% set model run options
-RUN.ID      =  'demo';          % run identifier
-RUN.plot    =  1;               % switch on to plot live output
-RUN.save    =  0;               % switch on to save output files
-RUN.nop     =  10;               % output every 'nop' grid steps of transport
-RUN.nup     =  1;               % update every 'nup' grid steps of transport
-
+RUN.ID        =  'demo';        % run identifier
+RUN.plot      =  1;             % switch on to plot live output
+RUN.save      =  1;             % switch on to save output files
+RUN.nop       =  10;            % output every 'nop' grid steps of transport
+RUN.nup       =  1;             % update every 'nup' grid steps of transport
+RUN.selfgrav  =  1;             % switch on for self-gravitation
 
 %% set model timing
 NUM.yr      =  3600*24*365.25;  % seconds per year
@@ -32,7 +32,7 @@ NUM.dz      =  NUM.D/NUM.nz;    % spacing of z coordinates
 
 %% set physicsal parameters
 PHY.Rho0    =  3300;            % reference density [kg/m3]
-PHY.Eta0    =  1e20;         	% reference viscosity [Pas]
+PHY.Eta0    =  1e18;         	% reference viscosity [Pas]
 PHY.aT0     =  3e-5;            % thermal expansivity [1/K]
 PHY.kT0     =  10;              % Thermal conductivity [W/m/K]
 PHY.Cp0     =  1000;            % Volumetric heat capacity [J/kg/K]
@@ -43,7 +43,7 @@ PHY.gx      =  0;               % x-gravity
 
 %% set initial condition
 SOL.T0      =  100;           	% reference/top potential temperature [C]
-SOL.T1      =  2000;           	% bottom potential temperature (if different from top) [C]
+SOL.T1      = 1000;           	% bottom potential temperature (if different from top) [C]
 SOL.dT      =  300;           	% temperature perturbation amplitude [C]
 SOL.rT      =  100e3;         	% radius of hot plume [m]
 SOL.zT      =  NUM.D/2;         % z-position of hot plume [m]
@@ -58,8 +58,8 @@ SOL.Ttype   = 'constant';       % constant ambient background temperature
 %% set boundary conditions
 % Temperature boundary conditions
 SOL.BCTempTop     = 'isothermal';    	% 'isothermal' or 'insulating' bottom boundaries
-SOL.BCTempBot     = 'insulating';    	% 'isothermal' or 'insulating' bottom boundaries
-SOL.BCTempSides   = 'insulating';    	% 'isothermal' or 'insulating' bottom boundaries
+SOL.BCTempBot     = 'isothermal';    	% 'isothermal' or 'insulating' bottom boundaries
+SOL.BCTempSides   = 'isothermal';    	% 'isothermal' or 'insulating' bottom boundaries
 
 % Velocity boundary conditions: free slip = -1; no slip = 1
 SOL.BCleft  = -1;               % left side boundary
@@ -77,9 +77,9 @@ NUM.AdvnScheme  = 'fromm';
 % NUM.AdvnScheme  = 'flxdiv'
 
 NUM.CFL         = 0.5;   	% Courant number to limit physical time step
-NUM.theta     	= 0.5;      % 0 = backwards Euler, 0.5 = Crank-Nicholson, 1 = Forward Euler
+NUM.theta     	= 1.0;      % 0 = backwards Euler, 0.5 = Crank-Nicholson, 1 = Forward Euler
 NUM.restol    	= 1e-3;     % residual tolerance for nonlinear iterations
-NUM.cstab     	= 1e-7;     % stabilising coefficient for P-diagonal
+NUM.cstab     	= 1e-6;     % stabilising coefficient for P-diagonal
 
 
 %% start model run [do not modify]
