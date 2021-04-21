@@ -1,8 +1,9 @@
-% Planetesimal: update material properties and stress/strain-rate fields
+% planetesimal: update material properties and stress/strain-rate fields
 
 % print update header
 fprintf(1,'  ---  update materials & deformation \n');
 tic;  % start clock on update
+
 
 %% update thermal parameters (currently held constant)
 
@@ -73,10 +74,10 @@ DEF.tII(:,[1 end]) = DEF.tII(:,[2 end-1]);
 
 %% update heat source fields
 % update shear heating
-SOL.Hs = DEF.eII.*DEF.tII;
+SOL.Hs = 2.*DEF.eII.*DEF.tII;
 
 % update adiabatic heating
-SOL.Ha = -(SOL.WP.*PHY.gz + SOL.UP.*PHY.gx) .* MAT.Rho.*MAT.aT.*SOL.T;
+SOL.Ha = (SOL.WP.*PHY.gz + SOL.UP.*PHY.gx) .* MAT.Rho.*MAT.aT.*SOL.T;
 
 
 toc_update = toc;

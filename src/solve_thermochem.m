@@ -1,4 +1,4 @@
-% Planetesimal: solve thermo-chemical equations
+% planetesimal: solve thermo-chemical equations
 
 % print solver header
 fprintf(1,'  ---  solve thermo-chemical equations \n');

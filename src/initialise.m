@@ -1,4 +1,8 @@
-% Planetesimal: initialise model run
+% planetesimal: initialise model run
+
+% print initialisation header
+fprintf(1,'  ---  initialise model run \n\n');
+
 
 %% setup numerical grid
 % set dimensions of staggered/ghosted 2D grid

@@ -1,7 +1,8 @@
-% Planetesimal: generate output
+% planetesimal: generate output
 
 % print output header
 fprintf(1,'*****  prepare output frame %d  *****\n',RUN.frame);
+
 
 %% plot output figures
 if RUN.plot

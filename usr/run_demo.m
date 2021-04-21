@@ -1,4 +1,4 @@
-% Planetesimal: user control script
+% planetesimal: user control script
 clear; close all;
 
 

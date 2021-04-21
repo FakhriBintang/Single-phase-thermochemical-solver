@@ -1,4 +1,4 @@
-% Planetesimal: solve fluid mechanics equations
+% planetesimal: solve fluid mechanics equations
 
 % print solver header
 fprintf(1,'  ---  solve fluid mechanics equations \n');

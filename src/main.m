@@ -1,4 +1,4 @@
-% Planetesimal: main model routine
+% planetesimal: main model routine
 
 % print run header
 fprintf(1,'\n\n************************************************************\n');
