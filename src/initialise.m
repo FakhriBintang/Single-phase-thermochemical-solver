@@ -54,6 +54,10 @@ switch SOL.Ttype
         SOL.T = zeros(NUM.nzP,NUM.nxP) + SOL.T0;
         SOL.T = SOL.T + 1./(1+exp(-(NUM.ZP-SOL.zT+pert)./(NUM.D/50))) .* (SOL.T1-SOL.T0);
 end
+
+% convert from potential to natural temperature
+SOL.T = SOL.T.*exp(PHY.aT0*(PHY.gz.*(NUM.ZP+pert) + PHY.gx.*NUM.XP)./PHY.Cp0);
+
 % zero gradient boundaries
 SOL.T([1 end],:) = SOL.T([2 end-1],:);
 SOL.T(:,[1 end]) = SOL.T(:,[2 end-1]);
