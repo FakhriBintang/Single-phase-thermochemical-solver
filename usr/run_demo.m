@@ -5,7 +5,7 @@ clear; close all;
 %% set model run options
 RUN.ID      =  'Tpot';          % run identifier
 RUN.plot    =  1;               % switch on to plot live output
-RUN.save    =  1;               % switch on to save output files
+RUN.save    =  0;               % switch on to save output files
 RUN.nop     =  10;               % output every 'nop' grid steps of transport
 RUN.nup     =  1;               % update every 'nup' grid steps of transport
 
@@ -70,9 +70,9 @@ SOL.BCbot   = -1;               % bottom boundary
 
 %% set solver options
 % advection scheme %
-% NUM.AdvnScheme	= 'fromm';
+NUM.AdvnScheme  = 'fromm';
 % NUM.AdvnScheme  = 'first upwind'
-NUM.AdvnScheme  = 'second upwind';
+% NUM.AdvnScheme  = 'second upwind';
 % NUM.AdvnScheme  = 'third upwind'
 % NUM.AdvnScheme  = 'flxdiv'
 
