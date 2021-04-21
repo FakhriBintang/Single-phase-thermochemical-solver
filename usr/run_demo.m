@@ -3,10 +3,10 @@ clear; close all;
 
 
 %% set model run options
-RUN.ID      =  'demo';          % run identifier
+RUN.ID      =  'Tpot';          % run identifier
 RUN.plot    =  1;               % switch on to plot live output
 RUN.save    =  1;               % switch on to save output files
-RUN.nop     =  5;               % output every 'nop' grid steps of transport
+RUN.nop     =  10;               % output every 'nop' grid steps of transport
 RUN.nup     =  1;               % update every 'nup' grid steps of transport
 
 
@@ -36,28 +36,29 @@ PHY.Eta0    =  1e19;         	% reference viscosity [Pas]
 PHY.aT0     =  3e-5;            % thermal expansivity [1/K]
 PHY.kT0     =  10;              % Thermal conductivity [W/m/K]
 PHY.Cp0     =  1000;            % Volumetric heat capacity [J/kg/K]
-PHY.Hr0     =  1e-8;            % Radiogenic heat productivity [W/m3]
+PHY.Hr0     =  1e-6;            % Radiogenic heat productivity [W/m3]
 PHY.gz      =  10;              % z-gravity 
 PHY.gx      =  0;               % x-gravity
 
 
 %% set initial condition
-SOL.T0      =  1000;           	% reference (top) temperature [C]
-SOL.T1      =  2000;           	% bottom temperature (if different from top) [C]
+SOL.T0      =  100;           	% reference/top potential temperature [C]
+SOL.T1      =  2000;           	% bottom potential temperature (if different from top) [C]
 SOL.dT      =  300;           	% temperature perturbation amplitude [C]
 SOL.rT      =  100e3;         	% radius of hot plume [m]
 SOL.zT      =  NUM.D/2;         % z-position of hot plume [m]
 SOL.xT      =  NUM.L/2;         % x-position of hot plume [m]
 
-% SOL.Ttype   = 'constant';       % constant ambient background temperature
-SOL.Ttype   = 'linear';         % linear temperaure profile between top and bottom
+SOL.Ttype   = 'constant';       % constant ambient background temperature
+% SOL.Ttype   = 'linear';         % linear temperaure profile between top and bottom
 % SOL.Ttype   = 'gaussian';       % Gaussian central plume
 % SOL.Ttype   = 'hot bottom';     % hot deep layer, skips the initial T diffusion stage
 
 
 %% set boundary conditions
 % Temperature boundary conditions
-SOL.BCTempTopBot  = 'isothermal';    	% 'isothermal' or 'insulating' bottom boundaries
+SOL.BCTempTop     = 'isothermal';    	% 'isothermal' or 'insulating' bottom boundaries
+SOL.BCTempBot     = 'insulating';    	% 'isothermal' or 'insulating' bottom boundaries
 SOL.BCTempSides   = 'insulating';    	% 'isothermal' or 'insulating' bottom boundaries
 
 % Velocity boundary conditions: free slip = -1; no slip = 1
@@ -69,13 +70,13 @@ SOL.BCbot   = -1;               % bottom boundary
 
 %% set solver options
 % advection scheme %
-NUM.AdvnScheme	= 'fromm';
-% SOL.AdvnScheme  = 'first upwind'
-% SOL.AdvnScheme  = 'second upwind'
-% SOL.AdvnScheme  = 'third upwind'
-% SOL.AdvnScheme  = 'flxdiv'
+% NUM.AdvnScheme	= 'fromm';
+% NUM.AdvnScheme  = 'first upwind'
+NUM.AdvnScheme  = 'second upwind';
+% NUM.AdvnScheme  = 'third upwind'
+% NUM.AdvnScheme  = 'flxdiv'
 
-NUM.CFL         = 1/4;   	% Courant number to limit physical time step
+NUM.CFL         = 0.5;   	% Courant number to limit physical time step
 NUM.theta     	= 0.5;      % 0 = backwards Euler, 0.5 = Crank-Nicholson, 1 = Forward Euler
 NUM.restol    	= 1e-3;     % residual tolerance for nonlinear iterations
 NUM.cstab     	= 1e-7;     % stabilising coefficient for P-diagonal
