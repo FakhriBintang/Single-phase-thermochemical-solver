@@ -32,7 +32,7 @@ NUM.dz      =  NUM.D/NUM.nz;    % spacing of z coordinates
 
 %% set physicsal parameters
 PHY.Rho0    =  3300;            % reference density [kg/m3]
-PHY.Eta0    =  1e19;         	% reference viscosity [Pas]
+PHY.Eta0    =  1e20;         	% reference viscosity [Pas]
 PHY.aT0     =  3e-5;            % thermal expansivity [1/K]
 PHY.kT0     =  10;              % Thermal conductivity [W/m/K]
 PHY.Cp0     =  1000;            % Volumetric heat capacity [J/kg/K]
@@ -69,7 +69,7 @@ SOL.BCbot   = -1;               % bottom boundary
 
 
 %% set solver options
-% advection scheme %
+% advection scheme
 NUM.AdvnScheme  = 'fromm';
 % NUM.AdvnScheme  = 'first upwind'
 % NUM.AdvnScheme  = 'second upwind';
