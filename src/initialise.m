@@ -127,12 +127,12 @@ MAT.Hr	 = zeros(NUM.nzP,NUM.nxP) + PHY.Hr0;	% radiogenic heating
 
 
 %% update nonlinear material properties
+RUN.frame = 0;     % initialise output frame count
+NUM.time  = 0;      % initialise time count
+NUM.step  = 0;      % initialise time step count
 up2date;
 
 
 %% output initial condition
-RUN.frame = 0;     % initialise output frame count
-NUM.time  = 0;      % initialise time count
-NUM.step  = 0;      % initialise time step count
 output;
 
