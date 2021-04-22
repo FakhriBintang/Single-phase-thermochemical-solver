@@ -12,7 +12,7 @@ initialise;
 
 %% physical time stepping loop
 
-while NUM.time < NUM.tend && NUM.step < NUM.maxstep
+while NUM.time <= NUM.tend && NUM.step <= NUM.maxstep
 
     % print time step header
     fprintf(1,'\n*****  step = %d;  dt = %1.4e;  time = %1.4e yr \n\n',NUM.step,NUM.dt/NUM.yr,NUM.time/NUM.yr);
