@@ -46,6 +46,8 @@ NUM.MapW  =  reshape(1:NUM.NW,NUM.nzW,NUM.nxW);
 NUM.MapU  =  reshape(1:NUM.NU,NUM.nzU,NUM.nxU) + NUM.NW;
 NUM.MapP  =  reshape(1:NUM.NP,NUM.nzP,NUM.nxP) + NUM.NW + NUM.NU;
 
+%% initiate cell falgging for free surface
+solve_flag
 
 %% setup material property arrays
 MAT.Rho	= zeros(NUM.nzP,NUM.nxP) + PHY.Rho0;  	% density
@@ -80,11 +82,11 @@ switch SOL.Ttype
 end
 
 % convert from potential to natural temperature
-if   RUN.selfgrav; SOL.T = SOL.T.*exp(PHY.aT0*PHY.gP.*(NUM.D/2-NUM.RP)./PHY.Cp0);
+if   RUN.selfgrav; SOL.T = SOL.T.*exp(PHY.aT0*PHY.gP.*(NUM.D*0.9/2-NUM.RP)./PHY.Cp0);
 else;              SOL.T = SOL.T.*exp(PHY.aT0*(PHY.gzP.*(NUM.ZP+pert) + PHY.gxP.*NUM.XP)./PHY.Cp0); end
 
 % set atmospheric/space temperature in self-gravitating case
-if RUN.selfgrav; SOL.T(NUM.RP>NUM.D/2) = SOL.T0;
+if RUN.selfgrav; SOL.T(NUM.RP>NUM.D*0.9/2) = 0;
 % zero gradient boundaries
 else
     SOL.T([1 end],:) = SOL.T([2 end-1],:);

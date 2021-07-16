@@ -5,7 +5,7 @@ clear; close all;
 %% set model run options
 RUN.ID        =  'demo';        % run identifier
 RUN.plot      =  1;             % switch on to plot live output
-RUN.save      =  1;             % switch on to save output files
+RUN.save      =  0;             % switch on to save output files
 RUN.nop       =  10;            % output every 'nop' grid steps of transport
 RUN.nup       =  1;             % update every 'nup' grid steps of transport
 RUN.selfgrav  =  1;             % switch on for self-gravitation
