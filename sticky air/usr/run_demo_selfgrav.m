@@ -3,10 +3,10 @@ clear; close all;
 
 
 %% set model run options
-RUN.ID        =  'square';        % run identifier
+RUN.ID        =  'sphere in sace';        % run identifier
 RUN.plot      =  1;             % switch on to plot live output
 RUN.save      =  1;             % switch on to save output files
-RUN.nop       =  5;            % output every 'nop' grid steps of transport
+RUN.nop       =  3;            % output every 'nop' grid steps of transport
 RUN.nup       =  1;             % update every 'nup' grid steps of transport
 RUN.selfgrav  =  1;             % switch on for self-gravitation
 
@@ -22,8 +22,8 @@ NUM.dt      =  1e3*NUM.yr;      % (initial) time step [s]
 %% set model domain
 NUM.D       =  500*1e3;         % length of z domain
 NUM.L       =  500*1e3;         % length of x domain
-NUM.nz      =  100;             % number of real z block nodes
-NUM.nx      =  100;          	% number of real x block nodes
+NUM.nz      =  200;             % number of real z block nodes
+NUM.nx      =  200;          	% number of real x block nodes
 
 % [do not modify]
 NUM.dx      =  NUM.L/NUM.nx;    % spacing of x coordinates
@@ -32,22 +32,26 @@ NUM.dz      =  NUM.D/NUM.nz;    % spacing of z coordinates
 
 %% set physicsal parameters
 PHY.Rho0    =  3300;            % reference density [kg/m3]
-PHY.Eta0    =  1e18;         	% reference viscosity [Pas]
+PHY.Rhoa    =  0;               % air density
+PHY.Eta0    =  1e20;         	% reference viscosity [Pas]
+PHY.Etaa    =  1e17;            % sticky air viscosity
 PHY.aT0     =  3e-5;            % thermal expansivity [1/K]
 PHY.kT0     =  10;              % Thermal conductivity [W/m/K]
 PHY.Cp0     =  1000;            % Volumetric heat capacity [J/kg/K]
 PHY.Hr0     =  1e-6;            % Radiogenic heat productivity [W/m3]
+% PHY.Hr0 = 0;
 PHY.gz      =  10;              % z-gravity 
 PHY.gx      =  0;               % x-gravity
 
 
 %% set initial condition
-SOL.T0      =  100;           	% reference/top potential temperature [C]
+SOL.Ta      =  273;             % reference air/space temperature
+SOL.T0      =  300;           	% reference/top potential temperature [C]
 SOL.T1      = 1000;           	% bottom potential temperature (if different from top) [C]
 SOL.dT      =  300;           	% temperature perturbation amplitude [C]
-SOL.rT      =  100e3;         	% radius of hot plume [m]
-SOL.zT      =  NUM.D/2;         % z-position of hot plume [m]
-SOL.xT      =  NUM.L/2;         % x-position of hot plume [m]
+SOL.rT      =  NUM.D/6; %100e3;         	% radius of hot plume [m]
+SOL.zT      =  0;         % z-position of hot plume [m]
+SOL.xT      =  0;         % x-position of hot plume [m]
 
 SOL.Ttype   = 'constant';       % constant ambient background temperature
 % SOL.Ttype   = 'linear';         % linear temperaure profile between top and bottom
@@ -70,14 +74,14 @@ SOL.BCbot   = -1;               % bottom boundary
 
 %% set solver options
 % advection scheme
-NUM.AdvnScheme  = 'fromm';
+% NUM.AdvnScheme  = 'fromm';
 % NUM.AdvnScheme  = 'first upwind'
 % NUM.AdvnScheme  = 'second upwind';
-% NUM.AdvnScheme  = 'third upwind'
+NUM.AdvnScheme  = 'third upwind';
 % NUM.AdvnScheme  = 'flxdiv'
 
-NUM.CFL         = 0.5;   	% Courant number to limit physical time step
-NUM.theta     	= 1.0;      % 0 = backwards Euler, 0.5 = Crank-Nicholson, 1 = Forward Euler
+NUM.CFL         = 0.3;   	% Courant number to limit physical time step
+NUM.theta     	= 0.5;      % 0 = backwards Euler, 0.5 = Crank-Nicholson, 1 = Forward Euler
 NUM.restol    	= 1e-3;     % residual tolerance for nonlinear iterations
 NUM.cstab     	= 1e-6;     % stabilising coefficient for P-diagonal
 
@@ -102,4 +106,5 @@ cm1 =        cbrewer('seq','YlOrRd',30) ; % sequential colour map
 cm2 = flipud(cbrewer('div','RdBu'  ,30)); % divergent colour map
 
 % run model
+run('initialise_selfgrav')
 run('main');

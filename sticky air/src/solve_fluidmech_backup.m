@@ -8,8 +8,8 @@ fprintf(1,'  ---  solve fluid mechanics equations \n');
 
 % get characteristic scales
 Pscale = geomean(MAT.Eta(:))/(NUM.dx*NUM.dz); % pressure scaling coefficient
-RhoRef = mean(MAT.Rho(:));                    % mean density for lithostatic pressure
-
+RhoRef = mean(MAT.Rho(NUM.PHI>0));                    % mean density for lithostatic pressure
+RhoRef = mean(MAT.Rho(:));
 % get mapping arrays
 indU = NUM.MapU;
 indW = NUM.MapW;
@@ -27,80 +27,36 @@ tic;  % start clock system assembly
 
 %% assemble coefficients of z momentum equation for z-velocity W
 
-% % left boundary
-% ii = indW(:,1); jj1 = ii; jj2 = indW(:,2);
-% aa = zeros(size(ii));
-% II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa+1];
-% II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa+SOL.BCleft];
-% IR = [IR; ii(:)]; RR = [RR; aa(:)];
-% 
-% % bottom boundary
-% ii = indW(:,end); jj1 = ii; jj2 = indW(:,end-1);
-% aa = zeros(size(ii));
-% II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
-% II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)+SOL.BCright];
-% IR = [IR; ii(:)]; RR = [RR; aa(:)];
-% 
-% % top boundary
-% ii = indW(1,:).'; jj = ii;
-% aa = zeros(size(ii));
-% II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa+1];
-% IR = [IR; ii(:)]; RR = [RR; aa(:)];
-% 
-% % bottom boundary
-% ii = indW(end,:).'; jj = ii;
-% aa = zeros(size(ii));
-% II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa+1];
-% IR = [IR; ii(:)]; RR = [RR; aa(:)];
-
 % left boundary
-% [xw,zw] = find(NUM.flag.W == 0);
-% ii  = indW(NUM.flag.W(:,1)  == 0); jj1 = ii;
-% jj2 = indW(NUM.flag.W(:,2)  == 0);
-% aa = zeros(size(ii));
-% II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa+1];
-% II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa+SOL.BCleft];
-% IR = [IR; ii(:)]; RR = [RR; aa(:)];
-
-% left boundary
-bc = NUM.flag.W(:,1) == 0; % check if the boundary is within the active nodes,
-% multiplies matrix by 1 if active, multiplies by 0 if inactive
 ii = indW(:,1); jj1 = ii; jj2 = indW(:,2);
 aa = zeros(size(ii));
-II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa+bc.*1];
-II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa+bc.*SOL.BCleft];
-IR = [IR; ii(:)]; RR = [RR; aa(:)];
-
-
-% right boundary
-bc = NUM.flag.W(:,end) == 0; 
-ii = indW(:,end); jj1 = ii; jj2 = indW(:,end-1);
-aa = zeros(size(ii));
-II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+bc.*1];
-II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)+bc.*SOL.BCright];
-IR = [IR; ii(:)]; RR = [RR; aa(:)];
-
-% top boundary
-bc = NUM.flag.W(1,:) == 0; bc = bc';
-ii = indW(1,:).'; jj = ii;
-aa = zeros(size(ii));
-II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa+bc.*1];
+II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa+1];
+II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa+SOL.BCleft];
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % bottom boundary
-bc = NUM.flag.W(end,:) == 0; bc = bc';
+ii = indW(:,end); jj1 = ii; jj2 = indW(:,end-1);
+aa = zeros(size(ii));
+II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
+II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)+SOL.BCright];
+IR = [IR; ii(:)]; RR = [RR; aa(:)];
+
+% top boundary
+ii = indW(1,:).'; jj = ii;
+aa = zeros(size(ii));
+II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa+1];
+IR = [IR; ii(:)]; RR = [RR; aa(:)];
+
+% bottom boundary
 ii = indW(end,:).'; jj = ii;
 aa = zeros(size(ii));
-II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa+bc.*1];
+II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa+1];
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % internal points
-% ii    = indW(2:end-1,2:end-1);
-% EtaC1 = MAT.EtaC(2:end-1,1:end-1); EtaC2 = MAT.EtaC(2:end-1,2:end  ); 
-% EtaP1 = MAT.Eta (2:end-2,2:end-1); EtaP2 = MAT.Eta (3:end-1,2:end-1);
-ii = indW(NUM.flag.W == 0);
-ww = NUM.flag.W == 0;
-[xw,zw] = find(NUM.flag.W == 0);
+ii    = indW(2:end-1,2:end-1);
+EtaC1 = MAT.EtaC(2:end-1,1:end-1); EtaC2 = MAT.EtaC(2:end-1,2:end  ); 
+EtaP1 = MAT.Eta (2:end-2,2:end-1); EtaP2 = MAT.Eta (3:end-1,2:end-1);
 
 % coefficients multiplying z-velocities W
 %             top          ||         bottom          ||           left            ||          right
@@ -138,33 +94,29 @@ IR = [IR; ii(:)];  RR = [RR; rr(:)];
 %% assemble coefficients of x momentum equation for x-velocity U
 
 % top boundary
-bc = NUM.flag.U(1,:) == 0;
 ii = indU(1,:).'; jj1 = ii; jj2 = indU(2,:).';
 aa = zeros(size(ii));
-II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; bc.*aa+1];
-II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; bc.*aa+SOL.BCtop];
+II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa+1];
+II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa+SOL.BCtop];
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % bottom boundary
-bc = NUM.flag.U(end,:) == 0;
 ii = indU(end,:).'; jj1 = ii; jj2 = indU(end-1,:).';
 aa = zeros(size(ii));
-II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; bc.*aa(:)+1];
-II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; bc.*aa(:)+SOL.BCbot];
+II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
+II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)+SOL.BCbot];
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % left side boundary
-bc = NUM.flag.U(:,1) == 0;
 ii = indU(:,1); jj = ii;
 aa = zeros(size(ii));
-II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; bc.*aa+1];
+II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa+1];
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % right side boundary
-bc = NUM.flag.U(:,end) == 0;
 ii = indU(:,end); jj = ii;
 aa = zeros(size(ii));
-II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; bc.*aa+1];
+II = [II; ii(:)]; JJ = [JJ; jj(:)];   AA = [AA; aa+1];
 IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 % internal points
@@ -206,60 +158,35 @@ IR = [IR; ii(:)];  RR = [RR; rr(:)];
 
 
 %% assemble coefficients of continuity equation for P
-% % boundary points
-% ii  = [indP(1,:).'; indP(end  ,:).']; % top & bottom
-% jj1 = ii;
-% jj2 = [indP(2,:).'; indP(end-1,:).'];
-% 
-% aa = zeros(size(ii));
-% II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
-% II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)-1];
-% IR = [IR; ii(:)]; RR = [RR; aa(:)];
-% 
-% ii  = [indP(:,1); indP(:,end  )]; % left & right
-% jj1 = ii;
-% jj2 = [indP(:,2); indP(:,end-1)];
-% 
-% aa = zeros(size(ii));
-% II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
-% II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)-1];
-% IR = [IR; ii(:)]; RR = [RR; aa(:)];
+% boundary points
+ii  = [indP(1,:).'; indP(end  ,:).']; % top & bottom
+jj1 = ii;
+jj2 = [indP(2,:).'; indP(end-1,:).'];
 
-ii  = indP(NUM.flag.P ==6).';
-aa  = zeros(size(ii));
-II  = [II; ii(:)]; JJ = [JJ; ii(:)];    AA = [AA; aa(:)+1];
-IR  = [IR; ii(:)]; RR = [RR; aa(:)];
+aa = zeros(size(ii));
+II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
+II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)-1];
+IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
-% % bottom
-% ii  = indP(end  ,:).';
-% jji = ii; jj2 = indP(end-1,:).';
-% 
-% aa  = zeros(size(ii));
-% II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
-% II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)-1];
-% IR = [IR; ii(:)]; RR = [RR; aa(:)];
-% 
-% 
-% ii  = [indP(:,1).'; indP(:,end  ).']; % left & right
-% jj1 = ii;
-% jj2 = [indP(:,2).'; indP(:,end-1).'];
-% 
-% aa = zeros(size(ii));
-% II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
-% II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)-1];
-% IR = [IR; ii(:)]; RR = [RR; aa(:)];
+ii  = [indP(:,1); indP(:,end  )]; % left & right
+jj1 = ii;
+jj2 = [indP(:,2); indP(:,end-1)];
+
+aa = zeros(size(ii));
+II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)+1];
+II = [II; ii(:)]; JJ = [JJ; jj2(:)];   AA = [AA; aa(:)-1];
+IR = [IR; ii(:)]; RR = [RR; aa(:)];
 
 %internal points
-ii = indP(NUM.flag.P == 0);
+ii = indP(2:end-1,2:end-1);
 
 % coefficients multiplying pressure P
-aa = NUM.cstab*NUM.dx*NUM.dz./MAT.Eta(NUM.flag.P == 0);
+aa = NUM.cstab*NUM.dx*NUM.dz./MAT.Eta(2:end-1,2:end-1);
 II = [II; ii(:)]; JJ = [JJ; ii(:)];    AA = [AA; aa(:)];  % P on stencil centre
 
 % coefficients multiplying velocities U, W
 %          left U          ||           right U       ||           top W           ||          bottom W
-[xu,zu] = find(NUM.flag.P == 0);                        
-jj1 = indU(zu,xu-1);         jj2 = indU(zu,xu);        jj3 = indW(zu-1,xu);         jj4 = indW(zu,xu);
+jj1 = indU(2:end-1,1:end-1); jj2 = indU(2:end-1,2:end); jj3 = indW(1:end-1,2:end-1); jj4 = indW(2:end,2:end-1);
 
 aa = zeros(size(ii));
 II = [II; ii(:)]; JJ = [JJ; jj1(:)];   AA = [AA; aa(:)-1/NUM.dx];  % U one to the left

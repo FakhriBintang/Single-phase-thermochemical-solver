@@ -42,29 +42,35 @@ NUM.flag.C = (NUM.flag.P(1:end-1,1:end-1) ...
     +  NUM.flag.P(2:end  ,2:end  ));
 NUM.flag.C(NUM.flag.C>0) = 3;
 toc
-figure()
+figure(10)
 subplot(2,2,1)
 imagesc(NUM.xP,NUM.zP,NUM.flag.P)
 colorbar
 % hold on
 % plot(NUM.xP,NUM.Fs,'--k', 'linewidth', 3)
 title('P-flagging')
+axis tight
+
 subplot(2,2,2)
 imagesc(NUM.xU,NUM.zU,NUM.flag.U)
 colorbar
 % hold on
 % plot(NUM.xP,NUM.Fs,'--k', 'linewidth', 3)
 title('U-flagging')
+axis tight
+
 subplot(2,2,3)
 imagesc(NUM.xW,NUM.zW,NUM.flag.W)
 colorbar
 % hold on
 % plot(NUM.xP,NUM.Fs,'--k', 'linewidth', 3)
 title('W-flagging')
+axis tight
+
 subplot(2,2,4)
 imagesc(NUM.xC,NUM.zC,NUM.flag.C)
 colorbar
 % hold on
 % plot(NUM.xP,NUM.Fs,'--k', 'linewidth', 3)
 title('C-flagging')
-
+axis tight
